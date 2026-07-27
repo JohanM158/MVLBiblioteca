@@ -1,0 +1,27 @@
+# Node / Angular
+**/node_modules
+/frontend/node_modules
+/frontend/.angular
+/frontend/dist
+
+# Java / Maven
+**/target
+/backend/target
+*.class
+*.jar
+*.war
+
+# IDEs & System
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Personal / Study files
+*GEMINI*
+*ESTUDIO*
+*.txt
+*.zip
+*.log
+*.tmp
