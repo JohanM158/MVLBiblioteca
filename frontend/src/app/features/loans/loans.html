@@ -1,0 +1,166 @@
+<div class="fade-in">
+  <div class="page-header">
+    <div>
+      <span class="page-eyebrow">Circulación</span>
+      <h1 class="page-title">Gestión de Préstamos</h1>
+      <p class="page-subtitle">Registra y administra los préstamos de libros</p>
+    </div>
+    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+      <select class="form-control" style="width: auto; min-width: 160px;" [(ngModel)]="filterStatus" aria-label="Filtrar por estado">
+        <option value="ALL">Todos</option>
+        <option value="ACTIVE">Activos</option>
+        <option value="RETURNED">Devueltos</option>
+      </select>
+      <button class="btn btn-primary" (click)="openCreate()"><app-icon name="plus" [size]="16" /> Nuevo Préstamo</button>
+    </div>
+  </div>
+
+  <div class="glass-card-static rules-banner">
+    <h4>Reglas de Préstamo</h4>
+    <div class="rules-grid">
+      <span class="rule-item"><app-icon name="book-open" [size]="15" /> Solo libros disponibles</span>
+      <span class="rule-item"><app-icon name="user" [size]="15" /> Solo usuarios activos</span>
+      <span class="rule-item"><app-icon name="hash" [size]="15" /> Máx. 3 préstamos por usuario</span>
+      <span class="rule-item"><app-icon name="calendar" [size]="15" /> Plazo: 14 días</span>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="glass-card-static sk-table-wrap">
+      <div class="sk-table-head">
+        @for (h of [1,2,3,4,5,6]; track h) { <app-skeleton variant="line" width="60%" /> }
+      </div>
+      @for (r of [1,2,3,4,5]; track r) {
+        <div class="sk-table-row">
+          <app-skeleton variant="line" width="82%" />
+          <app-skeleton variant="line" width="55%" />
+          <app-skeleton variant="line" width="42%" />
+          <app-skeleton variant="line" width="50%" />
+          <app-skeleton variant="line" width="30%" />
+          <app-skeleton variant="block" width="84px" height="22px" />
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="glass-card-static" style="padding: 0; overflow: hidden;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Libro</th>
+            <th>Usuario</th>
+            <th>Fecha Préstamo</th>
+            <th>Fecha Devolución</th>
+            <th>Devuelto</th>
+            <th>Estado</th>
+            <th style="text-align: right;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (loan of filteredLoans(); track loan.id) {
+            <tr class="slide-up">
+              <td>
+                <div style="color: var(--text-primary); font-weight: 500;">{{ loan.bookTitle }}</div>
+                <div style="font-size: 0.8125rem; color: var(--text-muted);">{{ loan.bookAuthor }}</div>
+              </td>
+              <td>
+                <div>{{ loan.userName }}</div>
+                <div style="font-size: 0.8125rem; color: var(--text-muted);">{{ loan.userEmail }}</div>
+              </td>
+              <td>{{ loan.loanDate }}</td>
+              <td>{{ loan.dueDate }}</td>
+              <td>{{ loan.returnDate || '—' }}</td>
+              <td>
+                <span class="badge" [class]="getStatusClass(loan)">{{ getStatusText(loan) }}</span>
+              </td>
+              <td style="text-align: right;">
+                @if (loan.status === 'ACTIVE') {
+                  <button class="btn btn-success btn-sm" (click)="confirmReturn(loan)">
+                    <app-icon name="corner-up-left" [size]="15" /> Devolver
+                  </button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7">
+                <div class="empty-state">
+                  <div class="empty-state-icon"><app-icon name="refresh" [size]="44" /></div>
+                  <p>No se encontraron préstamos</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<!-- Create Loan Modal -->
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Nuevo Préstamo</h3>
+        <button class="btn btn-icon btn-secondary" (click)="closeModal()" aria-label="Cerrar">
+          <app-icon name="x" [size]="18" />
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Libro *</label>
+          <select class="form-control" [(ngModel)]="form.bookId">
+            <option [ngValue]="0" disabled>Seleccionar libro disponible</option>
+            @for (book of availableBooks(); track book.id) {
+              <option [ngValue]="book.id">{{ book.title }} — {{ book.author }}</option>
+            }
+          </select>
+          @if (availableBooks().length === 0) {
+            <p class="form-error">No hay libros disponibles para préstamo</p>
+          }
+        </div>
+        <div class="form-group">
+          <label class="form-label">Usuario *</label>
+          <select class="form-control" [(ngModel)]="form.userId">
+            <option [ngValue]="0" disabled>Seleccionar usuario activo</option>
+            @for (user of activeUsers(); track user.id) {
+              <option [ngValue]="user.id">{{ user.firstName }} {{ user.lastName }} — {{ user.email }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notas (opcional)</label>
+          <textarea class="form-control" [(ngModel)]="form.notes" placeholder="Notas adicionales..." rows="2"></textarea>
+        </div>
+        <div class="glass-card-static" style="padding: 1rem; margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
+          <app-icon name="info" [size]="16" /> El plazo de devolución será de <strong style="color: var(--text-primary);">14 días</strong> a partir de hoy.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" (click)="createLoan()">Registrar Préstamo</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Return Confirmation -->
+@if (showReturnConfirm()) {
+  <div class="modal-backdrop" (click)="cancelReturn()">
+    <div class="modal-content" (click)="$event.stopPropagation()" style="max-width: 420px;">
+      <div class="modal-header">
+        <h3>Confirmar Devolución</h3>
+      </div>
+      <div class="modal-body">
+        <p>¿Confirmas la devolución del libro <strong>"{{ returningLoan()?.bookTitle }}"</strong>?</p>
+        <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.875rem;">
+          Prestado a: {{ returningLoan()?.userName }}
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cancelReturn()">Cancelar</button>
+        <button class="btn btn-success" (click)="returnBook()"><app-icon name="corner-up-left" [size]="15" /> Confirmar Devolución</button>
+      </div>
+    </div>
+  </div>
+}
