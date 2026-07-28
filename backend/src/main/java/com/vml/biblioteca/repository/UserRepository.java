@@ -1,3 +1,4 @@
+// genera consultas con leer el nombre de metodo (findByemail)
 package com.vml.biblioteca.repository;
 
 import com.vml.biblioteca.entity.User;
