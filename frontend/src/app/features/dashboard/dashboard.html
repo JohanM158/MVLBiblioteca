@@ -1,0 +1,116 @@
+<div class="fade-in">
+  <!-- MASTHEAD editorial (no el page-header genérico) -->
+  <header class="masthead">
+    <div>
+      <span class="page-eyebrow">Sala de lectura</span>
+      <h1 class="masthead-title">Dashboard</h1>
+      <p class="page-subtitle">Resumen general de la biblioteca</p>
+    </div>
+    <div class="masthead-meta">
+      <span class="meta-rule"></span>
+      <span class="meta-date">{{ todayLabel }}</span>
+      <span class="meta-motto">Ex libris · VML</span>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="stats-grid">
+      @for (n of [1,2,3,4,5]; track n) {
+        <div class="glass-card stat-card">
+          <app-skeleton variant="block" width="46px" height="46px" />
+          <div style="margin-top: 1rem;"><app-skeleton variant="block" width="55%" height="2.2rem" /></div>
+          <div style="margin-top: 0.5rem;"><app-skeleton variant="line" width="40%" /></div>
+        </div>
+      }
+    </div>
+  } @else if (stats()) {
+    <!-- PORTADA: ficha maestra + marginalia -->
+    <section class="front-page slide-up">
+      <article class="glass-card shelf-card">
+        <span class="page-eyebrow">Circulación</span>
+        <div class="shelf-head">
+          <span class="shelf-number">{{ animatedBooks() }}</span>
+          <span class="shelf-unit">volúmenes<br />en catálogo</span>
+        </div>
+        <p class="shelf-prose">
+          <strong>{{ inCirculation }}</strong> de {{ stats()!.totalBooks }} libros están ahora en manos
+          de lectores — el <strong>{{ shelfOccupancy }}%</strong> del estante.
+        </p>
+        <div class="shelf-meter" role="img" [attr.aria-label]="'Estante ocupado al ' + shelfOccupancy + ' por ciento'">
+          <div class="shelf-fill" [style.width.%]="shelfOccupancy"></div>
+        </div>
+        <div class="shelf-scale">
+          <span>vacío</span><span>estante completo</span>
+        </div>
+      </article>
+
+      <aside class="marginalia glass-card-static" aria-label="Indicadores">
+        <div class="marg-item">
+          <span class="marg-label">Usuarios</span>
+          <span class="marg-value">{{ stats()!.totalUsers }}</span>
+        </div>
+        <div class="marg-item">
+          <span class="marg-label">Disponibles</span>
+          <span class="marg-value">{{ stats()!.availableBooks }}</span>
+        </div>
+        <div class="marg-item">
+          <span class="marg-label">Préstamos activos</span>
+          <span class="marg-value">{{ stats()!.activeLoans }}</span>
+        </div>
+        <div class="marg-item" [class.is-alert]="stats()!.overdueLoans > 0">
+          <span class="marg-label">Vencidos</span>
+          <span class="marg-value">
+            {{ stats()!.overdueLoans }}
+            @if (stats()!.overdueLoans > 0) { <span class="marg-stamp">revisar</span> }
+          </span>
+        </div>
+      </aside>
+    </section>
+
+    <!-- RANKINGS -->
+    <div class="dashboard-grid">
+      <div class="glass-card-static dashboard-section">
+        <h3><app-icon name="trophy" [size]="18" /> Top 5 Libros Más Prestados</h3>
+        <div class="top-list">
+          @for (book of stats()!.topBooks; track book.bookId; let i = $index) {
+            <div class="top-list-item">
+              <div class="top-list-rank" [class]="i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-default'">{{ i + 1 }}</div>
+              <div class="top-list-info">
+                <div class="top-list-title">{{ book.title }}</div>
+                <div class="top-list-subtitle">{{ book.author }}</div>
+              </div>
+              <div class="top-list-count">{{ book.loanCount }}</div>
+            </div>
+          } @empty {
+            <div class="empty-state"><p>Sin datos de préstamos aún</p></div>
+          }
+        </div>
+      </div>
+
+      <div class="glass-card-static dashboard-section">
+        <h3><app-icon name="user" [size]="18" /> Usuarios Más Activos</h3>
+        <div class="top-list">
+          @for (user of stats()!.activeUsers; track user.userId; let i = $index) {
+            <div class="top-list-item">
+              <div class="top-list-rank" [class]="i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-default'">{{ i + 1 }}</div>
+              <div class="top-list-info">
+                <div class="top-list-title">{{ user.name }}</div>
+                <div class="top-list-subtitle">{{ user.email }}</div>
+              </div>
+              <div class="top-list-count">{{ user.loanCount }}</div>
+            </div>
+          } @empty {
+            <div class="empty-state"><p>Sin datos de usuarios aún</p></div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <a routerLink="/books" class="btn btn-primary"><app-icon name="book-open" [size]="16" /> Gestionar Libros</a>
+      <a routerLink="/users" class="btn btn-secondary"><app-icon name="users" [size]="16" /> Gestionar Usuarios</a>
+      <a routerLink="/loans" class="btn btn-secondary"><app-icon name="refresh" [size]="16" /> Gestionar Préstamos</a>
+      <a routerLink="/statistics" class="btn btn-secondary"><app-icon name="chart" [size]="16" /> Ver Estadísticas</a>
+    </div>
+  }
+</div>

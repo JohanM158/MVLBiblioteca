@@ -1,0 +1,158 @@
+<div class="fade-in">
+  <div class="page-header">
+    <div>
+      <span class="page-eyebrow">Catálogo</span>
+      <h1 class="page-title">Gestión de Libros</h1>
+      <p class="page-subtitle">Administra el catálogo de la biblioteca</p>
+    </div>
+    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+      <div class="search-bar">
+        <app-icon name="search" [size]="16" class="search-bar-icon" />
+        <input type="text" placeholder="Buscar por título o autor..." [(ngModel)]="searchQuery" (input)="onSearch()" aria-label="Buscar libros" />
+      </div>
+      <button class="btn btn-primary" (click)="openCreate()"><app-icon name="plus" [size]="16" /> Nuevo Libro</button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="glass-card-static sk-table-wrap">
+      <div class="sk-table-head">
+        @for (h of [1,2,3,4,5,6]; track h) { <app-skeleton variant="line" width="60%" /> }
+      </div>
+      @for (r of [1,2,3,4,5]; track r) {
+        <div class="sk-table-row">
+          <app-skeleton variant="line" width="82%" />
+          <app-skeleton variant="line" width="55%" />
+          <app-skeleton variant="line" width="42%" />
+          <app-skeleton variant="line" width="50%" />
+          <app-skeleton variant="line" width="30%" />
+          <app-skeleton variant="block" width="84px" height="22px" />
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="glass-card-static" style="padding: 0; overflow: hidden;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>ISBN</th>
+            <th>Género</th>
+            <th>Año</th>
+            <th>Estado</th>
+            <th style="text-align: right;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (book of books(); track book.id) {
+            <tr class="slide-up">
+              <td style="color: var(--text-primary); font-weight: 500;">{{ book.title }}</td>
+              <td>{{ book.author }}</td>
+              <td><code>{{ book.isbn || '—' }}</code></td>
+              <td>{{ book.genre || '—' }}</td>
+              <td>{{ book.year || '—' }}</td>
+              <td>
+                <span class="badge" [class]="book.available ? 'badge-available' : 'badge-unavailable'">
+                  {{ book.available ? 'Disponible' : 'Prestado' }}
+                </span>
+              </td>
+              <td style="text-align: right;">
+                <button class="btn btn-secondary btn-sm" (click)="openEdit(book)" style="margin-right: 0.5rem;">
+                  <app-icon name="edit" [size]="15" /> Editar
+                </button>
+                <button class="btn btn-danger btn-sm" (click)="confirmDelete(book)" aria-label="Eliminar {{ book.title }}">
+                  <app-icon name="trash" [size]="15" />
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7">
+                <div class="empty-state">
+                  <div class="empty-state-icon"><app-icon name="book-open" [size]="44" /></div>
+                  <p>No se encontraron libros</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<!-- Create/Edit Modal -->
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editingBook() ? 'Editar Libro' : 'Nuevo Libro' }}</h3>
+        <button class="btn btn-icon btn-secondary" (click)="closeModal()" aria-label="Cerrar">
+          <app-icon name="x" [size]="18" />
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Título *</label>
+            <input class="form-control" [(ngModel)]="form.title" placeholder="Ej: Cien años de soledad" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Autor *</label>
+            <input class="form-control" [(ngModel)]="form.author" placeholder="Ej: Gabriel García Márquez" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">ISBN</label>
+            <input class="form-control" [(ngModel)]="form.isbn" placeholder="Ej: 978-0307474728" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Género</label>
+            <select class="form-control" [(ngModel)]="form.genre">
+              <option value="">Seleccionar género</option>
+              @for (genre of genres; track genre) {
+                <option [value]="genre">{{ genre }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Año</label>
+            <input class="form-control" type="number" [(ngModel)]="form.year" placeholder="Ej: 1967" />
+          </div>
+          <div class="form-group">&nbsp;</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descripción</label>
+          <textarea class="form-control" [(ngModel)]="form.description" placeholder="Breve descripción del libro..." rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" (click)="save()">{{ editingBook() ? 'Actualizar' : 'Crear' }} Libro</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete Confirmation -->
+@if (showDeleteConfirm()) {
+  <div class="modal-backdrop" (click)="cancelDelete()">
+    <div class="modal-content" (click)="$event.stopPropagation()" style="max-width: 420px;">
+      <div class="modal-header">
+        <h3>Confirmar Eliminación</h3>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de eliminar el libro <strong>"{{ deletingBook()?.title }}"</strong>?</p>
+        <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.875rem;">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cancelDelete()">Cancelar</button>
+        <button class="btn btn-danger" (click)="deleteBook()"><app-icon name="trash" [size]="15" /> Eliminar</button>
+      </div>
+    </div>
+  </div>
+}

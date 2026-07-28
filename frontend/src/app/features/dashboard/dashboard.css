@@ -1,0 +1,227 @@
+/* ---- Masthead ---- */
+.masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  padding-bottom: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+.masthead::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  width: 52px;
+  height: 16px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 16'%3E%3Cpath d='M2 8h13M37 8h13' stroke='%23b8934a' stroke-width='1'/%3E%3Ccircle cx='18' cy='8' r='1.3' fill='%23b8934a'/%3E%3Ccircle cx='34' cy='8' r='1.3' fill='%23b8934a'/%3E%3Cpath d='M26 3l3.4 5-3.4 5-3.4-5z' fill='%23b8934a'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+.masthead-title {
+  font-family: var(--font-heading);
+  font-size: clamp(2.4rem, 1.6rem + 3vw, 3.6rem);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  font-variation-settings: 'opsz' 144;
+}
+.masthead-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  text-align: right;
+}
+.meta-rule {
+  width: 40px;
+  height: 1px;
+  background: var(--brass-bright);
+  margin-bottom: 0.3rem;
+}
+.meta-date {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: capitalize;
+  color: var(--text-secondary);
+}
+.meta-motto {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--brass);
+}
+
+/* ---- Portada: ficha maestra + marginalia ---- */
+.front-page {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-2xl);
+}
+
+.shelf-card {
+  padding: var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.shelf-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+.shelf-number {
+  font-family: var(--font-heading);
+  font-size: clamp(3.5rem, 2rem + 7vw, 6.5rem);
+  font-weight: 600;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  font-variation-settings: 'opsz' 144;
+  color: var(--text-primary);
+}
+.shelf-unit {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  line-height: 1.5;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.shelf-prose {
+  max-width: 100%;
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+}
+.shelf-prose strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* El estante que se llena */
+.shelf-meter {
+  position: relative;
+  height: 26px;
+  margin-top: 0.4rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.shelf-fill {
+  height: 100%;
+  width: 0;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--primary) 0 12px,
+      color-mix(in srgb, var(--primary) 78%, #000) 12px 14px
+    );
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.18), inset 0 -3px 6px rgba(0, 0, 0, 0.18);
+  transition: width 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s;
+}
+/* Sombra de "estante" bajo la barra */
+.shelf-meter::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 4px;
+  background: linear-gradient(180deg, rgba(38, 32, 25, 0.18), transparent);
+  border-radius: 99px;
+}
+.shelf-scale {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 0.6rem;
+}
+
+/* ---- Marginalia (KPIs como entradas de fichero) ---- */
+.marginalia {
+  padding: var(--space-lg) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+}
+.marg-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: 0.95rem 0;
+  border-bottom: 1px dashed var(--line);
+}
+.marg-item:last-child {
+  border-bottom: none;
+}
+.marg-label {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.marg-value {
+  font-family: var(--font-heading);
+  font-size: 1.7rem;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+/* El vencido se vuelve sello solo cuando hay algo que atender */
+.marg-item.is-alert .marg-value {
+  color: var(--accent-rose);
+}
+.marg-stamp {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-rose);
+  border: 1.5px double currentColor;
+  border-radius: 3px;
+  padding: 0.1em 0.4em;
+  transform: rotate(-3deg);
+  animation: pulse-badge 2.4s ease-in-out infinite;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 900px) {
+  .front-page {
+    grid-template-columns: 1fr;
+  }
+  .masthead-meta {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .shelf-card {
+    padding: var(--space-xl);
+  }
+}
+
+.quick-actions {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
