@@ -1,0 +1,132 @@
+<div class="fade-in">
+  <div class="page-header">
+    <div>
+      <span class="page-eyebrow">Análisis</span>
+      <h1 class="page-title">Estadísticas</h1>
+      <p class="page-subtitle">Análisis y métricas de la biblioteca</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="stats-grid">
+      @for (n of [1,2,3,4,5]; track n) {
+        <div class="glass-card stat-card">
+          <app-skeleton variant="block" width="46px" height="46px" />
+          <div style="margin-top: 1rem;"><app-skeleton variant="block" width="55%" height="2.2rem" /></div>
+          <div style="margin-top: 0.5rem;"><app-skeleton variant="line" width="40%" /></div>
+        </div>
+      }
+    </div>
+  } @else if (stats()) {
+    <div class="stats-grid slide-up">
+      <div class="glass-card stat-card stat-purple">
+        <div class="stat-icon"><app-icon name="book-open" [size]="22" /></div>
+        <div class="stat-value">{{ stats()!.totalBooks }}</div>
+        <div class="stat-label">Total Libros</div>
+      </div>
+      <div class="glass-card stat-card stat-cyan">
+        <div class="stat-icon"><app-icon name="users" [size]="22" /></div>
+        <div class="stat-value">{{ stats()!.totalUsers }}</div>
+        <div class="stat-label">Total Usuarios</div>
+      </div>
+      <div class="glass-card stat-card stat-emerald">
+        <div class="stat-icon"><app-icon name="check-circle" [size]="22" /></div>
+        <div class="stat-value">{{ stats()!.availableBooks }}</div>
+        <div class="stat-label">Disponibles</div>
+      </div>
+      <div class="glass-card stat-card stat-amber">
+        <div class="stat-icon"><app-icon name="refresh" [size]="22" /></div>
+        <div class="stat-value">{{ stats()!.activeLoans }}</div>
+        <div class="stat-label">Activos</div>
+      </div>
+      <div class="glass-card stat-card stat-rose">
+        <div class="stat-icon"><app-icon name="alert-triangle" [size]="22" /></div>
+        <div class="stat-value">{{ stats()!.overdueLoans }}</div>
+        <div class="stat-label">Vencidos</div>
+      </div>
+    </div>
+
+    <div class="stats-panels">
+      <div class="glass-card-static stats-panel">
+        <h3><app-icon name="calendar" [size]="18" /> Préstamos por Mes</h3>
+        <p class="stats-panel-subtitle">Últimos 6 meses</p>
+        @if (stats()!.loansByMonth && stats()!.loansByMonth!.length > 0) {
+          <div class="bar-chart">
+            @for (item of stats()!.loansByMonth; track item.month) {
+              <div class="bar-chart-item">
+                <div class="bar-chart-value">{{ item.count }}</div>
+                <div class="bar-chart-bar" [style.height]="getBarHeight(item.count, getMaxMonthlyCount())"></div>
+                <div class="bar-chart-label">{{ item.month }}</div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state"><p>Sin datos de préstamos</p></div>
+        }
+      </div>
+
+      <div class="glass-card-static stats-panel">
+        <h3><app-icon name="book" [size]="18" /> Distribución por Género</h3>
+        <p class="stats-panel-subtitle">Catálogo de la biblioteca</p>
+        @if (stats()!.genreDistribution && stats()!.genreDistribution!.length > 0) {
+          <div class="h-bar-chart">
+            @for (genre of stats()!.genreDistribution; track genre.genre; let i = $index) {
+              <div class="h-bar-item">
+                <div class="h-bar-label">{{ genre.genre }}</div>
+                <div class="h-bar-track">
+                  <div class="h-bar-fill" [class]="getBarColor(i)" [style.width]="genre.percentage + '%'">
+                    {{ genre.count }}
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state"><p>Sin datos de géneros</p></div>
+        }
+      </div>
+
+      <div class="glass-card-static stats-panel">
+        <h3><app-icon name="trophy" [size]="18" /> Top 5 Libros Más Prestados</h3>
+        <p class="stats-panel-subtitle">Ranking por número de préstamos</p>
+        @if (stats()!.topBooks && stats()!.topBooks!.length > 0) {
+          <div class="top-list">
+            @for (book of stats()!.topBooks; track book.bookId; let i = $index) {
+              <div class="top-list-item">
+                <div class="top-list-rank" [class]="getRankClass(i)">{{ i + 1 }}</div>
+                <div class="top-list-info">
+                  <div class="top-list-title">{{ book.title }}</div>
+                  <div class="top-list-subtitle">{{ book.author }}</div>
+                </div>
+                <div class="top-list-count">{{ book.loanCount }} <span style="font-size: 0.75rem; color: var(--text-muted);">préstamos</span></div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state"><p>Sin datos de préstamos</p></div>
+        }
+      </div>
+
+      <div class="glass-card-static stats-panel">
+        <h3><app-icon name="user" [size]="18" /> Usuarios Más Activos</h3>
+        <p class="stats-panel-subtitle">Top lectores de la biblioteca</p>
+        @if (stats()!.activeUsers && stats()!.activeUsers!.length > 0) {
+          <div class="top-list">
+            @for (user of stats()!.activeUsers; track user.userId; let i = $index) {
+              <div class="top-list-item">
+                <div class="top-list-rank" [class]="getRankClass(i)">{{ i + 1 }}</div>
+                <div class="top-list-info">
+                  <div class="top-list-title">{{ user.name }}</div>
+                  <div class="top-list-subtitle">{{ user.email }}</div>
+                </div>
+                <div class="top-list-count">{{ user.loanCount }} <span style="font-size: 0.75rem; color: var(--text-muted);">préstamos</span></div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state"><p>Sin datos de usuarios</p></div>
+        }
+      </div>
+    </div>
+  }
+</div>

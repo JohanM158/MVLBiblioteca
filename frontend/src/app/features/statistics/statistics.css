@@ -1,0 +1,27 @@
+.stats-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+  margin-top: var(--space-xl);
+}
+
+.stats-panel {
+  padding: var(--space-xl);
+}
+
+.stats-panel h3 {
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+}
+
+.stats-panel-subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-lg);
+}
+
+@media (max-width: 1024px) {
+  .stats-panels {
+    grid-template-columns: 1fr;
+  }
+}
