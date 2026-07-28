@@ -1,0 +1,74 @@
+<!-- Mobile menu toggle -->
+<button class="mobile-menu-toggle" (click)="toggleSidebar()" aria-label="Abrir menú de navegación">
+  <app-icon name="menu" [size]="20" />
+</button>
+
+<div class="app-layout">
+  <aside class="sidebar" [class.open]="sidebarOpen()">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon"><app-icon name="library" [size]="22" /></div>
+      <span class="sidebar-brand-text">BiblioVML</span>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Navegación principal">
+      <a class="nav-item" routerLink="/dashboard" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="nav-item-icon"><app-icon name="dashboard" [size]="18" /></span> Dashboard
+      </a>
+      <a class="nav-item" routerLink="/books" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="nav-item-icon"><app-icon name="book-open" [size]="18" /></span> Libros
+      </a>
+      <a class="nav-item" routerLink="/users" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="nav-item-icon"><app-icon name="users" [size]="18" /></span> Usuarios
+      </a>
+      <a class="nav-item" routerLink="/loans" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="nav-item-icon"><app-icon name="refresh" [size]="18" /></span> Préstamos
+      </a>
+      <a class="nav-item" routerLink="/statistics" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="nav-item-icon"><app-icon name="chart" [size]="18" /></span> Estadísticas
+      </a>
+    </nav>
+
+    <div class="sidebar-theme">
+      <span class="sidebar-theme-label">Apariencia</span>
+      <button
+        class="theme-switch"
+        (click)="toggleTheme()"
+        [attr.aria-label]="theme() === 'dark' ? 'Activar tema claro' : 'Activar tema oscuro'"
+        [attr.aria-pressed]="theme() === 'dark'"
+      >
+        <span class="theme-switch-thumb" [class.is-dark]="theme() === 'dark'">
+          <app-icon [name]="theme() === 'dark' ? 'moon' : 'sun'" [size]="14" />
+        </span>
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <svg class="exlibris" viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" stroke-width="1" />
+        <circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="0.75" />
+        <text x="24" y="23" text-anchor="middle" font-family="Fraunces, serif" font-size="10" font-weight="600" fill="currentColor">VML</text>
+        <text x="24" y="31" text-anchor="middle" font-family="Spline Sans Mono, monospace" font-size="3.4" letter-spacing="1.2" fill="currentColor">EX LIBRIS</text>
+      </svg>
+      <span>Sistema de Biblioteca<br />v1.0</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <router-outlet />
+  </main>
+</div>
+
+<!-- Toast notifications -->
+<div class="toast-container" aria-live="polite">
+  @for (toast of notify.toasts(); track toast.id) {
+    <div class="toast" [class]="'toast-' + toast.type" (click)="notify.dismiss(toast.id)">
+      @switch (toast.type) {
+        @case ('success') { <app-icon name="check-circle" [size]="18" /> }
+        @case ('error') { <app-icon name="x-circle" [size]="18" /> }
+        @case ('info') { <app-icon name="info" [size]="18" /> }
+        @case ('warning') { <app-icon name="alert-triangle" [size]="18" /> }
+      }
+      {{ toast.message }}
+    </div>
+  }
+</div>
